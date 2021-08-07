@@ -1,15 +1,66 @@
-// const fs = require('fs/promises')
-// const contacts = require('./contacts.json')
+const fs = require("fs");
+const path = require("path");
+const util = require("util");
 
-const listContacts = async () => {}
+const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 
-const getContactById = async (contactId) => {}
+const contactsPath = path.join(__dirname, "contacts.json");
 
-const removeContact = async (contactId) => {}
+const listContacts = async () => {
+  try {
+    const contactsFromDb = await readFile(contactsPath);
+    const contacts = JSON.parse(contactsFromDb);
 
-const addContact = async (body) => {}
+    return contacts;
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
-const updateContact = async (contactId, body) => {}
+const getContactById = async (contactId) => {
+  try {
+    const contactsFromDb = await readFile(contactsPath);
+    const contacts = JSON.parse(contactsFromDb);
+    const contact = contacts.find(
+      (contact) => contact.id === Number(contactId)
+    );
+
+    return contact;
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const removeContact = async (contactId) => {
+  try {
+    const contactsFromDb = await readFile(contactsPath);
+    const contacts = JSON.parse(contactsFromDb);
+    const filteredContacts = contacts.filter(
+      (contact) => contact.id !== Number(contactId)
+    );
+
+    return await writeFile(contactsPath, JSON.stringify(filteredContacts));
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const addContact = async (body) => {
+  try {
+    const contactsFromDb = await readFile(contactsPath);
+    const contacts = JSON.parse(contactsFromDb);
+    const id = contacts[contacts.length - 1].id + 1;
+    const newContact = { id, ...body };
+    const updatedContacts = [...contacts, newContact];
+
+    return await writeFile(contactsPath, JSON.stringify(updatedContacts));
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const updateContact = async (contactId, body) => {};
 
 module.exports = {
   listContacts,
@@ -17,4 +68,4 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
-}
+};
