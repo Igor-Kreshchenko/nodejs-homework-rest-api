@@ -71,7 +71,8 @@ const updateContact = async (contactId, body) => {
     const contactsFromDb = await readFile(contactsPath);
     const contacts = JSON.parse(contactsFromDb);
 
-    const contactToUpdate = contacts.find(
+    const newContacts = [...contacts];
+    const contactToUpdate = newContacts.find(
       (contact) => contact.id === Number(contactId)
     );
 
@@ -80,7 +81,7 @@ const updateContact = async (contactId, body) => {
         contactToUpdate[key] = body[key];
       }
 
-      await writeFile(contactsPath, JSON.stringify(contacts));
+      await writeFile(contactsPath, JSON.stringify(newContacts));
       return contactToUpdate;
     }
 
