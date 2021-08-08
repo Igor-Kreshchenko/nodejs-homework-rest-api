@@ -1,48 +1,47 @@
 const express = require("express");
 const router = express.Router();
 
-const tasks = require("../../model/index");
+const {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+  updateContact,
+} = require("../../model/index");
+const {
+  validateAdd,
+  validateUpdate,
+} = require("../../utils/validate/validator");
 
 router.get("/", async (req, res, next) => {
-  try {
-    const contacts = await tasks.listContacts();
-    res.json({
-      status: "success",
-      code: 200,
-      data: {
-        contacts,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
+  const contacts = await listContacts();
+  res.status(200).json(contacts);
 });
 
 router.get("/:contactId", async (req, res, next) => {
-  try {
-    const contact = await tasks.getContactById(req.params.contactId);
-    res.json({
-      status: "success",
-      code: 200,
-      data: {
-        contact,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
+  const contact = await getContactById(req.params.contactId);
+  contact
+    ? res.status(200).json(contact)
+    : res.status(404).json({ message: "Not found" });
 });
 
 router.post("/", async (req, res, next) => {
-  res.json({ message: "template message" });
+  const newContact = await addContact(req.body);
+  res.status(201).json(newContact);
 });
 
 router.delete("/:contactId", async (req, res, next) => {
-  res.json({ message: "template message" });
+  const result = await removeContact(req.params.contactId);
+  result
+    ? res.status(200).json({ message: "Contact deleted" })
+    : res.status(404).json({ message: "Not found" });
 });
 
 router.patch("/:contactId", async (req, res, next) => {
-  res.json({ message: "template message" });
+  const updatedContact = await updateContact(req.params.contactId, req.body);
+  updatedContact
+    ? res.status(200).json(updatedContact)
+    : res.status(404).json({ message: "Not found" });
 });
 
 module.exports = router;

@@ -40,7 +40,8 @@ const removeContact = async (contactId) => {
       (contact) => contact.id !== Number(contactId)
     );
 
-    return await writeFile(contactsPath, JSON.stringify(filteredContacts));
+    await writeFile(contactsPath, JSON.stringify(filteredContacts));
+    return true;
   } catch (error) {
     console.log(error.message);
   }
@@ -54,13 +55,33 @@ const addContact = async (body) => {
     const newContact = { id, ...body };
     const updatedContacts = [...contacts, newContact];
 
-    return await writeFile(contactsPath, JSON.stringify(updatedContacts));
+    await writeFile(contactsPath, JSON.stringify(updatedContacts));
+    return newContact;
   } catch (error) {
     console.log(error.message);
   }
 };
 
-const updateContact = async (contactId, body) => {};
+const updateContact = async (contactId, body) => {
+  try {
+    const contactsFromDb = await readFile(contactsPath);
+    const contacts = JSON.parse(contactsFromDb);
+
+    const contactToUpdate = contacts.find(
+      (contact) => contact.id === Number(contactId)
+    );
+    if (!contactToUpdate) return false;
+
+    for (const key in body) {
+      contactToUpdate[key] = body[key];
+    }
+
+    await writeFile(contactsPath, JSON.stringify(contacts));
+    return contactToUpdate;
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 module.exports = {
   listContacts,
