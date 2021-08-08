@@ -1,10 +1,13 @@
 const Joi = require("joi");
 
-const validateAdd = () => {};
+exports.validateAdding = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email({ minDomainSegments: 2 }).required(),
+  phone: Joi.string().required(),
+});
 
-const validateUpdate = () => {};
-
-module.exports = {
-  validateAdd,
-  validateUpdate,
-};
+exports.validateUpdating = Joi.object({
+  name: Joi.string(),
+  email: Joi.string().email({ minDomainSegments: 2 }),
+  phone: Joi.string(),
+}).or("name", "email", "phone");

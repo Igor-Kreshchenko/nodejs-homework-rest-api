@@ -26,7 +26,11 @@ const getContactById = async (contactId) => {
       (contact) => contact.id === Number(contactId)
     );
 
-    return contact;
+    if (contact) {
+      return contact;
+    }
+
+    return null;
   } catch (error) {
     console.log(error.message);
   }
@@ -70,14 +74,17 @@ const updateContact = async (contactId, body) => {
     const contactToUpdate = contacts.find(
       (contact) => contact.id === Number(contactId)
     );
-    if (!contactToUpdate) return false;
 
-    for (const key in body) {
-      contactToUpdate[key] = body[key];
+    if (contactToUpdate) {
+      for (const key in body) {
+        contactToUpdate[key] = body[key];
+      }
+
+      await writeFile(contactsPath, JSON.stringify(contacts));
+      return contactToUpdate;
     }
 
-    await writeFile(contactsPath, JSON.stringify(contacts));
-    return contactToUpdate;
+    return null;
   } catch (error) {
     console.log(error.message);
   }
