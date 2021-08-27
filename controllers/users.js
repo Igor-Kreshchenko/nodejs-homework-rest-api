@@ -21,7 +21,7 @@ const signup = async (req, res, next) => {
     return res.status(HttpCode.CREATED).json({
       status: "success",
       code: HttpCode.CREATED,
-      data: { id, email, subscription },
+      data: { user: { id, email, subscription } },
     });
   } catch (error) {
     next(error);
@@ -46,12 +46,17 @@ const login = async (req, res, next) => {
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
 
     await Users.updateToken(id, token);
+    const { email, subscription } = user;
 
-    res.json({
+    return res.status(HttpCode.OK).json({
       status: "success",
       code: HttpCode.OK,
       data: {
         token,
+        user: {
+          email,
+          subscription,
+        },
       },
     });
   } catch (error) {
@@ -70,8 +75,30 @@ const logout = async (req, res, next) => {
   }
 };
 
+const current = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const user = await Users.findById(id);
+    const { email, subscription } = user;
+
+    return res.status(HttpCode.OK).json({
+      status: `${HttpCode.OK} OK`,
+      code: HttpCode.OK,
+      data: {
+        user: {
+          email,
+          subscription,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   signup,
   login,
   logout,
+  current,
 };

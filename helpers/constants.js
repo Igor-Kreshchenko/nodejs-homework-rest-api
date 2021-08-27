@@ -19,7 +19,7 @@ const Subscription = {
 
 const limiterAPI = {
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 1000,
   handler: (req, res, next) => {
     return res.status(HttpCode.TOO_MANY_REQUESTS).json({
       status: "error",
