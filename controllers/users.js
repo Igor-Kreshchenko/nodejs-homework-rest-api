@@ -61,15 +61,10 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    const users = await Users.logout();
+    const id = req.user.id;
+    await Users.updateToken(id, null);
 
-    res.json({
-      status: "success",
-      code: HttpCode.OK,
-      data: {
-        contacts,
-      },
-    });
+    return res.status(HttpCode.NO_CONTENT).json({});
   } catch (error) {
     next(error);
   }
