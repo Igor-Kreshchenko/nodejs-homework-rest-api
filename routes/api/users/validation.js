@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { Subscription } = require("../../../helpers/constants");
 
 const schemaSignupUser = Joi.object({
   email: Joi.string().email({ minDomainSegments: 2 }).required(),
@@ -8,6 +9,12 @@ const schemaSignupUser = Joi.object({
 const schemaLoginUser = Joi.object({
   email: Joi.string().email({ minDomainSegments: 2 }).required(),
   password: Joi.string().required(),
+});
+
+const schemaUpdateSubscription = Joi.object({
+  subscription: Joi.string()
+    .valid(...Object.values(Subscription))
+    .required(),
 });
 
 const validate = async (schema, body, next) => {
@@ -29,5 +36,8 @@ module.exports = {
   },
   validateLoginUser: (req, res, next) => {
     return validate(schemaLoginUser, req.body, next);
+  },
+  validateUpdateSubscription: (req, res, next) => {
+    return validate(schemaUpdateSubscription, req.body, next);
   },
 };

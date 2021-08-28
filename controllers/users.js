@@ -96,9 +96,31 @@ const current = async (req, res, next) => {
   }
 };
 
+const subscription = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const user = await Users.updateSubscription(id, req.body);
+    const { email, subscription } = user;
+
+    return res.status(HttpCode.OK).json({
+      status: `${HttpCode.OK} success`,
+      code: HttpCode.OK,
+      data: {
+        user: {
+          email,
+          subscription,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   signup,
   login,
   logout,
   current,
+  subscription,
 };
