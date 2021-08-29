@@ -1,6 +1,11 @@
 const { HttpCode } = require("../helpers/constants");
 const jwt = require("jsonwebtoken");
+const fs = require("fs/promises");
+const path = require("path");
+
 require("dotenv").config();
+
+const UploadAvatarService = require("../services/local-upload");
 const SECRET_KEY = process.env.SECRET_KEY;
 const Users = require("../repositories/users");
 
@@ -16,12 +21,12 @@ const signup = async (req, res, next) => {
       });
     }
 
-    const { id, email, subscription } = await Users.create(req.body);
+    const { id, email, subscription, avatar } = await Users.create(req.body);
 
     return res.status(HttpCode.CREATED).json({
       status: "success",
       code: HttpCode.CREATED,
-      data: { user: { id, email, subscription } },
+      data: { user: { id, email, subscription, avatar } },
     });
   } catch (error) {
     next(error);
@@ -117,10 +122,45 @@ const subscription = async (req, res, next) => {
   }
 };
 
+const avatars = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const uploads = new UploadAvatarService(
+      path.join(process.env.PUBLIC_DIR, process.env.AVATAR_OF_USERS)
+    );
+    const avatarUrl = await uploads.saveAvatar({ idUser: id, file: req.file });
+
+    try {
+      await fs.unlink(
+        path.join(
+          process.env.PUBLIC_DIR,
+          process.env.AVATAR_OF_USERS,
+          req.user.avatar
+        )
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    await Users.updateAvatar(id, avatarUrl);
+
+    res.json({
+      status: "success",
+      code: HttpCode.OK,
+      data: {
+        avatarUrl,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   signup,
   login,
   logout,
   current,
   subscription,
+  avatars,
 };
