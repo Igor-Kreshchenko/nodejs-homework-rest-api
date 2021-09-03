@@ -122,7 +122,7 @@ const subscription = async (req, res, next) => {
   }
 };
 
-const avatars = async (req, res, next) => {
+const uploadAvatars = async (req, res, next) => {
   try {
     const id = req.user.id;
     const uploads = new UploadAvatarService(
@@ -162,5 +162,5 @@ module.exports = {
   logout,
   current,
   subscription,
-  avatars,
+  uploadAvatars,
 };
