@@ -7,6 +7,7 @@ const {
   validateSignupUser,
   validateLoginUser,
   validateUpdateSubscription,
+  validateRepeatVerification,
 } = require("./validation");
 
 router.patch("/", guard, validateUpdateSubscription, ctrl.subscription);
@@ -15,5 +16,12 @@ router.post("/login", validateLoginUser, ctrl.login);
 router.post("/logout", guard, ctrl.logout);
 router.get("/current", guard, ctrl.current);
 router.patch("/avatars", guard, upload.single("avatar"), ctrl.uploadAvatars);
+
+router.get("/verify/:verificationToken", ctrl.verify);
+router.post(
+  "/verify",
+  validateRepeatVerification,
+  ctrl.repeatEmailVerification
+);
 
 module.exports = router;
